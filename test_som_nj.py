@@ -2,7 +2,6 @@
 from node_nj import MiniSom
 import jax
 from jax import random, numpy as jnp
-import sys, pathlib
 import pprint
 import ninjax as nj
 import pandas as pd

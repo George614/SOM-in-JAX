@@ -10,11 +10,7 @@ from datetime import timedelta
 import pickle
 import os
 import numpy as np
-import sys, pathlib
-sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 import ninjax as nj
-# for unit tests
-import unittest
 
 """
     Minimalistic implementation of the Self Organizing Maps (SOM).
