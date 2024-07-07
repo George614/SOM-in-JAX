@@ -171,7 +171,6 @@ plt.show()
 """To understand how the training evolves we can plot the quantization and
 topographic error of the SOM at each step. This is particularly important 
 when estimating the number of iterations to run"""
-# NOTE this cell is not converted to Ninjax-compatible
 som = MiniSom(
     10,
     20,
@@ -179,8 +178,16 @@ som = MiniSom(
     sigma=3.0,
     learning_rate=0.7,
     neighborhood_function="gaussian",
-    random_seed=10,
+    name="larger_som",
+    verbose=False,
 )
+
+params = nj.init(som.init_weights)({}, next(RNG), seed=0)
+pprint.pprint(f"global params after init_weights: {params.keys()}")
+p_topographic_error = jax.jit(nj.pure(som.topographic_error))
+p_quantization_error = jax.jit(nj.pure(som.quantization_error))
+p_winner = jax.jit(nj.pure(som.winner))
+p_update = jax.jit(nj.pure(som.update))
 
 max_iter = 1000
 q_error = []
@@ -188,9 +195,10 @@ t_error = []
 
 for i in range(max_iter):
     rand_i = np.random.randint(len(data))
-    som.update(data[rand_i], som.winner(data[rand_i]), i, max_iter)
-    q_error.append(som.quantization_error(data))
-    t_error.append(som.topographic_error(data))
+    params, winner = p_winner(params, data[rand_i], seed=0)
+    params, _ = p_update(params, data[rand_i], winner, i, max_iter, seed=0)
+    q_error.append(p_quantization_error(params, data, seed=0)[1])
+    t_error.append(p_topographic_error(params, data, seed=0)[1])
 
 plt.plot(np.arange(max_iter), q_error, label="quantization error")
 plt.plot(np.arange(max_iter), t_error, label="topographic error")
@@ -201,7 +209,6 @@ plt.show()
 
 # %%
 # with PCA initialization
-# NOTE this cell is not converted to Ninjax-compatible
 som = MiniSom(
     10,
     20,
@@ -209,19 +216,26 @@ som = MiniSom(
     sigma=3.0,
     learning_rate=0.7,
     neighborhood_function="gaussian",
-    random_seed=10,
+    name="larger_som2",
+    verbose=False,
 )
 
-som.pca_weights_init(data)
+params = nj.init(som.init_weights)({}, next(RNG), seed=0)
+params = nj.init(som.pca_weights_init)(params, data, seed=0)
+p_winner = jax.jit(nj.pure(som.winner))
+p_update = jax.jit(nj.pure(som.update))
+p_topographic_error = jax.jit(nj.pure(som.topographic_error))
+p_quantization_error = jax.jit(nj.pure(som.quantization_error))
 max_iter = 1000
 q_error = []
 t_error = []
 
 for i in range(max_iter):
     rand_i = np.random.randint(len(data))
-    som.update(data[rand_i], som.winner(data[rand_i]), i, max_iter)
-    q_error.append(som.quantization_error(data))
-    t_error.append(som.topographic_error(data))
+    params, winner = p_winner(params, data[rand_i], seed=0)
+    params, _ = p_update(params, data[rand_i], winner, i, max_iter, seed=0)
+    q_error.append(p_quantization_error(params, data, seed=0)[1])
+    t_error.append(p_topographic_error(params, data, seed=0)[1])
 
 plt.plot(np.arange(max_iter), q_error, label="quantization error")
 plt.plot(np.arange(max_iter), t_error, label="topographic error")
