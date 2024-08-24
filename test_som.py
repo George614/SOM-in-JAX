@@ -116,7 +116,7 @@ indices = jnp.arange(len(data))
 winmap = som.win_map(data)
 win_idx, win_data = som.win_map_index_n_data(indices, data)
 candi_data, dists = som.get_neighbor_data(data[10], data, min_samples=num_samples)
-candi_idx, dists2 = som.get_neighbor_indices(data[10], data, indices, min_samples=num_samples)  # this should throw a ValueError if given a relatively large num_samples
+# candi_idx, dists2 = som.get_neighbor_indices(data[10], data, indices, min_samples=num_samples)  # this should throw a ValueError if given a relatively large num_samples
 
 # %%
 """To have an idea of which neurons of the map are activated more often 

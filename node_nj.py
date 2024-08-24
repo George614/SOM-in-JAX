@@ -23,8 +23,8 @@ def _build_iteration_indexes(
     """Returns an iterable with the indexes of the samples
     to pick at each iteration of the training.
 
-    If random_generator is not None, it must be an instance
-    of numpy.random.RandomState and it will be used
+    If random_key is not None, it must be an instance
+    of jax.random.PRNGKey and it will be used
     to randomize the order of the samples."""
     if use_epochs:
         iterations_per_epoch = jnp.arange(data_len)
@@ -456,6 +456,7 @@ class MiniSom(nj.Module):
         iterations = _build_iteration_indexes(
             len(data), len(num_iteration), self.verbose, random_key, self.use_epochs
         )
+        iterations = jnp.array(iterations)  # make sure the iterations is not a generator
         if self.use_epochs:
             def get_decay_rate(iteration_index, data_len):
                 return jnp.array(iteration_index / data_len, int)

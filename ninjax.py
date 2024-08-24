@@ -8,7 +8,7 @@ import jax
 import jax.numpy as jnp
 
 __version__ = '2.3.3'
-
+# Taken from "https://github.com/danijar/ninjax"
 
 ###############################################################################
 # State
